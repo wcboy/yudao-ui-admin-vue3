@@ -1,5 +1,5 @@
 import {resolve} from 'path'
-import type {ConfigEnv, UserConfig} from 'vite'
+import type {BuildOptions, ConfigEnv, UserConfig} from 'vite'
 import {loadEnv, normalizePath} from 'vite'
 import {createVitePlugins} from './build/vite'
 import {exclude, include} from "./build/vite/optimize"
@@ -21,6 +21,11 @@ export default ({command, mode}: ConfigEnv): UserConfig => {
         env = loadEnv(mode, root)
     }
     const variablesScssPath = normalizePath(pathResolve('src/styles/variables.scss'))
+    const minify: BuildOptions['minify'] = env.VITE_MINIFY === 'esbuild'
+        ? 'esbuild'
+        : env.VITE_MINIFY === 'false'
+            ? false
+            : 'terser'
     return {
         base: env.VITE_BASE_PATH,
         root: root,
@@ -74,7 +79,7 @@ export default ({command, mode}: ConfigEnv): UserConfig => {
             ]
         },
         build: {
-            minify: 'terser',
+            minify,
             outDir: env.VITE_OUT_DIR || 'dist',
             sourcemap: env.VITE_SOURCEMAP === 'true' ? 'inline' : false,
             // brotliSize: false,

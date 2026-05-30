@@ -4,6 +4,7 @@ dist
 dist-ssr
 /dist*
 pnpm-debug
+.pnpm-store
 auto-*.d.ts
 .idea
 .history
