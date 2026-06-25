@@ -34,15 +34,25 @@ export default ({command, mode}: ConfigEnv): UserConfig => {
             port: env.VITE_PORT, // 端口号
             host: "0.0.0.0",
             open: env.VITE_OPEN === 'true',
-            // 本地跨域代理. 目前注释的原因：暂时没有用途，server 端已经支持跨域
-            // proxy: {
-            //   ['/admin-api']: {
-            //     target: env.VITE_BASE_URL,
-            //     ws: false,
-            //     changeOrigin: true,
-            //     rewrite: (path) => path.replace(new RegExp(`^/admin-api`), ''),
-            //   },
-            // },
+            // 本地跨域代理，注入 tenant-id（替代 Docker nginx 的租户注入）
+            proxy: {
+              ['/admin-api']: {
+                target: 'http://127.0.0.1:48080',
+                ws: false,
+                changeOrigin: true,
+                headers: {
+                  'tenant-id': '1'
+                }
+              },
+              ['/app-api']: {
+                target: 'http://127.0.0.1:48080',
+                ws: false,
+                changeOrigin: true,
+                headers: {
+                  'tenant-id': '1'
+                }
+              },
+            },
         },
         // 项目使用的vite插件。 单独提取到build/vite/plugin中管理
         plugins: createVitePlugins(),
